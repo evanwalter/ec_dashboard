@@ -1,0 +1,146 @@
+    div
+	{
+    /*
+	border-top: 1px solid #000000;
+    border-left: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    border-right: 1px solid #000000;
+    background-color: transparent;*/
+    border-spacing: 0px;
+    font-family: Arial;
+    font-size: 11pt;     
+    font-weight: normal; 
+    border-radius: 5px;
+    margin: 3px;
+    color: Navy;		
+	}
+
+	.ecdb_box {
+		.height: 100%;
+	}	
+    invisible
+	{
+    border-top: 0px none transparent;
+    border-left: 0px none transparent;
+    border-bottom: 0px none transparent;
+    border-right: 0px none transparent;
+    background-color: transparent;
+    border-spacing: 0px;
+    font-family: Arial;
+    font-size: 11pt;     
+    font-weight: normal; 
+    margin: 3px;
+    color: Navy;		
+	}
+
+	select
+    {
+    border-top: .5px solid #000000;
+    border-left: .5px none #000000;
+    border-bottom: .5px none #000000;
+    border-right: .5px none #000000;
+    background-color: Transparent;
+    font-family: Arial;
+    font-size: 8pt;     
+    font-weight: normal; 
+    color: navy;
+    width:auto;   
+    }
+    
+    p.pclass
+    {
+    font-family: Tahoma;
+    font-size: 10pt;     
+    font-weight: bold;     
+    
+    }
+    
+    
+    nav{
+float:left;
+margin-top:91px;
+}
+nav ul, nav ul li{
+display:inline;
+}
+nav li{
+margin-left:10px;
+position:relative;
+padding:5px 20px;
+color:#A29874;
+background-color:#fff;
+border-top-right-radius:5px;
+border-top-left-radius:5px;
+ }
+
+nav a{
+position:relative;
+text-decoration:none;
+ }
+ 
+    .values
+    {
+    
+     font-family: Arial; 
+     font-size: 7pt; 
+     
+     }
+    .tcc_values_vertical
+    {
+     font-family: Arial; 
+     font-size: 7pt; 
+     
+     }
+
+    .tcc_values
+    {
+     font-family: Arial; 
+     font-size: 7pt; 
+     }
+    .tcc_values_1
+    {
+     font-family: Arial; 
+     font-size: 7pt; 
+     }
+    .tcc_values_2
+    {
+     font-family: Arial; 
+     font-size: 8pt; 
+     }
+    .circlevalues
+    {
+    
+     font-family: Arial; 
+     font-size: 8pt; 
+     
+     }
+    .items
+    {
+    
+     font-family: Arial; 
+     font-size: 8pt; 
+     
+     }
+    .legendtext
+    {
+    
+     font-family: Arial; 
+     font-size: 8pt; 
+     
+     }
+
+    .tcc_chartlabel
+    {
+    
+     font-family: Arial; 
+     font-size: 9pt; 
+     
+     }
+
+    .tcc_footnote
+    {
+    
+     font-family: Arial; 
+     font-size: 7pt; 
+     
+     }    
