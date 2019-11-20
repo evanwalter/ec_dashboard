@@ -9,10 +9,17 @@ tcc_div_chart_counter=1;
 class ECDashboard{
 	constructor(div_id,my_data,my_layout){
 		this.div_id=div_id;
+		for (let x=0;x < my_data.length;x++){
+			if (my_data[x].qid == undefined) {
+				my_data[x].qid = my_data[x].id;
+			}
+		}
 		this.my_data=my_data;
 		this.my_layout=my_layout;
 		this.evanscharts = new ECCharts();
+		this.ec_tables=new EcTables();;
 		this.evanscharts.colors(["#4343ee","#ee4333","#fe43ee"]);
+		this.run_times=0;
 	}
 	colors(colors){
 		this.evanscharts.colors(colors);
@@ -37,13 +44,17 @@ class ECDashboard{
 						let next_row_data_data=[];	
 					} else{	
 						let divcellname="div_id11__"+rowctr+"_"+x;
+						//if (this.run_times > 0) {
+						//	let div_db_cellname = document.getElementById(this.divcellname);
+						//	div_db_cellname.innerHTML="";
+						//}
 						let div_span="12" ;
 						let div_height=460;
 						let div_borderstyle="solid 1px #333";
 						if (!(next_row_data[x].height==undefined)) {div_height=next_row_data[x].height}; 
 						if (!(next_row_data[x].span==undefined)) {div_span=next_row_data[x].span}; 
 						if (!(next_row_data[x].borderstyle==undefined)) {div_borderstyle=next_row_data[x].borderstyle}; 
-						let classname="col-md-"+div_span;
+						let classname="ec-div-box col-md-"+div_span;
 						let new_cell=document.createElement("div");
 						new_cell.id=divcellname;
 						new_cell.className=classname;
@@ -81,7 +92,9 @@ class ECDashboard{
 									if (!(next_data_section.data_filter == undefined)){
 											let next_data=my_data.filter(a=>a.qid==next_data_section.data_filter)
 											if (next_data.length > 0) {
-												innerHTML=innerHTML.replace("[qtext]",next_data[0].qtext)
+												if (!(next_data[0].qtext==undefined) ) {
+													innerHTML=innerHTML.replace("[qtext]",next_data[0].qtext)
+												}
 												for (let z=0; z < next_data[0].data.length; z++ ) {
 														for (let z2=0;z2 <next_data[0].data[z].length; z2++){
 														innerHTML=innerHTML.replace("[item_points-"+z2+"]",next_data[0].item_points[z2]);
@@ -93,7 +106,7 @@ class ECDashboard{
 									new_cell_subcell.innerHTML=innerHTML;
 								  }	else {
 									if ( !(next_data_section.data_filter == undefined) ){
-										let next_data=this.my_data.filter(a=>a.qid==next_data_section.data_filter)
+										let next_data=this.my_data.filter(a=> a.qid==next_data_section.data_filter )
 										if (next_data.length > 0) {
 												let charttype="column";
 												let colors;
@@ -105,7 +118,11 @@ class ECDashboard{
 												if (chart_label==""){
 												   chart_label=next_data[0].qtext;
 												}
-												this.evanscharts.addchart(new_cell_subcell_id,next_data[0].data,next_data[0].item_points,next_data[0].items,charttype,chart_height,colors,chart_label);
+												if (charttype=="table"){
+													this.ec_tables.build_table(new_cell_subcell_id,next_data[0].data); 
+												}else {
+													this.evanscharts.addchart(new_cell_subcell_id,next_data[0].data,next_data[0].item_points,next_data[0].items,charttype,chart_height,colors,chart_label);
+												}
 											}
 										}	
 									}  // END ELSE
@@ -115,8 +132,10 @@ class ECDashboard{
 				}
 				
 			}
-			this.evanscharts.run();		
+			this.evanscharts.run();	
+		this.run_times+=1;
 	}  // END run()
+	// ENDING THE run()
 	resize(){
 		this.run();
 	}
@@ -210,7 +229,7 @@ class ECCharts{
 		  "colors" : colors,
 		"linecolor" : "#111",    
           "additionalsettings": { "showbackground" : true,"linearGradient" : this.gradient, "valueformat" : "%d%", "showlegend" : this.showlegend,"legend_position": "top", "shadeborders" : false, "borderleft": true, "borderright": false,
-           "bordertop": false, "borderbottom": true,  "barmargin" : 10, "showscales" : this.showscales,"legend_offset_x": -100,"legend_offset_y": 10}
+           "bordertop": false, "borderbottom": true,  "barmargin" : 18, "showscales" : this.showscales,"legend_offset_x": -100,"legend_offset_y": 10}
 			}; 
 			build_a_timber_creek_chart(my_new_chart)
 		}	
@@ -589,7 +608,8 @@ function build_line_chart(div_id,svgwidth,svgheight,myitems,myitempts,mylinedata
 
     bHorizontalLines=true;//bHorizontalLines=bShowScales;
 
-    var chartwidth=svgwidth-25;
+//    var chartwidth=svgwidth-25;
+    var chartwidth=svgwidth*1.07;
 //    var chartheight=svgheight-100;
     var chartheight=svgheight-50;//(svgheight/5);
 	if (chartwidth < 500) { legend_position="top"; }
@@ -674,7 +694,7 @@ function build_line_chart(div_id,svgwidth,svgheight,myitems,myitempts,mylinedata
                
                 if (bShowScales==true)
                 {
-                    svg.appendChild(write_line_of_text(tickcountvalue * (tickcounter - x) + percentage_suffix,25,50+((tickcount*heightmultiplier)*x)+5,"#333","values"));
+                    svg.appendChild(write_line_of_text(tickcountvalue * (tickcounter - x) + percentage_suffix,25,50+((tickcount*heightmultiplier)*x)+5,"#333","tcc_tick_values"));
                 }
         }
      /*   var l1=document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -767,7 +787,7 @@ function build_line_chart(div_id,svgwidth,svgheight,myitems,myitempts,mylinedata
                     ipt1.setAttribute("transform","translate("+xpos+","+ypos+")rotate(90)");
                     ipt1.textContent=myitempts[x];
                     ipt1.setAttribute("fill", "#333");
-                    ipt1.setAttribute("class","values");
+                    ipt1.setAttribute("class","tcc_values");
 
                     ipt1.textContent=myitempts[x];
                     svg.appendChild(ipt1);       
@@ -781,7 +801,7 @@ function build_line_chart(div_id,svgwidth,svgheight,myitems,myitempts,mylinedata
                 ipt1.setAttribute("x", 50+(linewidth*x));
                 ipt1.setAttribute("y", 50+((20*heightmultiplier)*5)+15); 
                 ipt1.setAttribute("fill", "#333");
-                ipt1.setAttribute("class","values");
+                ipt1.setAttribute("class","tcc_values");
                
 		next_label=myitempts[x]
 		if ((next_label.length*4)<linewidth)
@@ -792,7 +812,7 @@ function build_line_chart(div_id,svgwidth,svgheight,myitems,myitempts,mylinedata
                 	iptxt1.setAttribute("x", 50+(linewidth*x));
                 	iptxt1.setAttribute("y", 50+((20*heightmultiplier)*5)+15); 
 			iptxt1.setAttribute("fill", "#333");
-                	iptxt1.setAttribute("class","values");
+                	iptxt1.setAttribute("class","tcc_values_1");
                 	iptxt1.textContent=myitempts[x];
                 	ipt1.appendChild(iptxt1);
                 } else
@@ -817,7 +837,7 @@ function build_line_chart(div_id,svgwidth,svgheight,myitems,myitempts,mylinedata
                 				aiptxt1.setAttribute("x", 50+(linewidth*x));
                 				aiptxt1.setAttribute("y", label_rowctr+50+((20*heightmultiplier)*5)+15); 
 						aiptxt1.setAttribute("fill", "#333");
-                				aiptxt1.setAttribute("class","values");
+                				aiptxt1.setAttribute("class","tcc_values");
                 				aiptxt1.textContent=(next_label);
                 				ipt1.appendChild(aiptxt1);
 				} else
@@ -830,7 +850,7 @@ function build_line_chart(div_id,svgwidth,svgheight,myitems,myitempts,mylinedata
                 				aiptxt1.setAttribute("x", 50+(linewidth*x));
                 				aiptxt1.setAttribute("y", label_rowctr+50+((20*heightmultiplier)*5)+15); 
 						aiptxt1.setAttribute("fill", "#333");
-                				aiptxt1.setAttribute("class","values");
+                				aiptxt1.setAttribute("class","tcc_values");
                 				aiptxt1.textContent=(next_label);
                 				ipt1.appendChild(aiptxt1);
 					next_label="";
@@ -1068,7 +1088,7 @@ bBarBorders, bShadeBorders,bLinearGradient, bHideTickMarks,bBorderLeft,bBorderRi
                 lt1.setAttribute("y", 50+chartheight+20);
                 lt1.setAttribute("x", margin_left+((tickcount*widthmultiplier)*x)-15);
                 lt1.setAttribute("fill", "#333");
-                lt1.setAttribute("class","values");
+                lt1.setAttribute("class","tcc_values");
                 lt1.textContent = tickcountvalue * (x) + percentage_suffix;
                 svg.appendChild(lt1);
         }
@@ -1309,7 +1329,7 @@ bBarBorders, bShadeBorders,bLinearGradient, bHideTickMarks,bBorderLeft,bBorderRi
                 ipt1.setAttribute("x", 5);
                 ipt1.setAttribute("y", 50+(barheight*(x)*items.length)+5);
                 ipt1.setAttribute("fill", "#333");
-                ipt1.setAttribute("class","values");
+                ipt1.setAttribute("class","tcc_values");
                
 		next_label=myitempts[x]
 		if ((next_label.length*4)<75)
@@ -1318,7 +1338,7 @@ bBarBorders, bShadeBorders,bLinearGradient, bHideTickMarks,bBorderLeft,bBorderRi
                 	iptxt1.setAttribute("x", 5);
                 	iptxt1.setAttribute("y", 50+(barheight*(x)*items.length)+(barheight*items.length)/3);
                 	iptxt1.setAttribute("fill", "#333");
-                	iptxt1.setAttribute("class","values");
+                	iptxt1.setAttribute("class","tcc_values");
                 	iptxt1.textContent=myitempts[x];
                 	ipt1.appendChild(iptxt1);
                 } else
@@ -1676,7 +1696,8 @@ barmargin, bShowBackground, valueformat, bColumn_Borders, bShadeBorders, bHideTi
                         t2.setAttribute("x2", 50+(barwidth*x*items.length));
                         t2.setAttribute("y1", 50+((20*heightmultiplier)*5));
                         t2.setAttribute("y2", 50+((20*heightmultiplier)*5)+5);  
-                        t2.setAttribute("stroke", "#222");  
+                        t2.setAttribute("stroke", "#222"); 
+						t2.setAttribute("class","tcc_tick_values");
                         svg.appendChild(t2);  
                 }
                 var ipt1 =  document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -1709,7 +1730,7 @@ barmargin, bShowBackground, valueformat, bColumn_Borders, bShadeBorders, bHideTi
                         		}
                         		iptxt1.setAttribute("y", 50+((20*heightmultiplier)*5)+20+(10*z));
                         		iptxt1.setAttribute("fill", "#333");
-                        		iptxt1.setAttribute("class","values");
+                        		iptxt1.setAttribute("class","tcc_values");
                         		iptxt1.textContent=nextitempt[z];
                         		ipt1.appendChild(iptxt1);
                      } else
@@ -1728,7 +1749,7 @@ barmargin, bShowBackground, valueformat, bColumn_Borders, bShadeBorders, bHideTi
                         		    iptxt1.setAttribute("x", 50+(barwidth*x*items.length) );
                         		    iptxt1.setAttribute("y", 50+((20*heightmultiplier)*5)+20+(10*z+(10*ictr)));
                         		    iptxt1.setAttribute("fill", "#333");
-                        		    iptxt1.setAttribute("class","values");
+                        		    iptxt1.setAttribute("class","tcc_values");
                         		    iptxt1.textContent=nextitemptstg;
                         		    ipt1.appendChild(iptxt1);
                         	    nextitemptstgpre= nextitempt2[z2];
@@ -1740,7 +1761,7 @@ barmargin, bShowBackground, valueformat, bColumn_Borders, bShadeBorders, bHideTi
                         		    iptxt1.setAttribute("x", 50+(barwidth*x*items.length) );
                         		    iptxt1.setAttribute("y", 50+((20*heightmultiplier)*5)+20+(10*z+(10*ictr)));
                         		    iptxt1.setAttribute("fill", "#333");
-                        		    iptxt1.setAttribute("class","values");
+                        		    iptxt1.setAttribute("class","tcc_values");
                         		    iptxt1.textContent=nextitemptstg;
                         		    ipt1.appendChild(iptxt1);
                         	    nextitemptstgpre= nextitempt2[z2];
@@ -1850,7 +1871,7 @@ static_max_value_on_scale,static_number_of_ticks,bBorderLeft,bBorderRight,bBorde
     bHorizontalLines=bShowScales;
         
     var chartlabel_height=50;    
-    var chartwidth=svgwidth;
+    var chartwidth=svgwidth*.97;
     var chartheight=svgheight-50;
 	if (chartwidth < 500) { legend_position="top"; }
     //--------------- CHART LABELS -------------------------------------//
@@ -1908,6 +1929,7 @@ static_max_value_on_scale,static_number_of_ticks,bBorderLeft,bBorderRight,bBorde
     svg.setAttribute("id",div_id+"-"+tcc_div_chart_counter+"svg");
 
 
+    //barwidth=(chartwidth-80)/(mydata.length*mydata[0].length);
     barwidth=(chartwidth-80)/(mydata.length*mydata[0].length);
     heightmultiplier=chartheight/200;
 
@@ -1964,7 +1986,7 @@ static_max_value_on_scale,static_number_of_ticks,bBorderLeft,bBorderRight,bBorde
                 lt1.setAttribute("x", 25);
                 lt1.setAttribute("y", 50+((tickcount*heightmultiplier)*x)+5);
                 lt1.setAttribute("fill", "#333");
-                lt1.setAttribute("class","values");
+                lt1.setAttribute("class","tcc_tick_values");
                
                 lt1.textContent=tickcountvalue*(tickcounter-x)+percentage_suffix;
                 svg.appendChild(lt1);
@@ -2504,7 +2526,6 @@ static_max_value_on_scale,static_number_of_ticks,bBorderLeft,bBorderRight,bBorde
 
 //----------------------------------------------------------------------------------------------------------------------------------------------//
 //----------------------------------------- BUILD A PIE CHART -----------------------------------------------------//
-
 function build_pie_chart(div_id, svgwidth, svgheight, myitems, myitempts, mydatainput, colors, bShowLegend, bShowScales,
 chart_label, chart_label_class, chart_label_position,footnotes,footnotes_class, bIsPercent, bShowBackground, valueformat,item_class,value_text_class) {
 	//alert(bShowLegend);
@@ -3509,6 +3530,102 @@ function tcc_item_column_click(this_charttype,svgid,objid,lineid,num,num2,border
 }
 
 
+	let ec_table_counter=0;
+	let ec_add_checkbox=false;
+	
+	class EcTables{
+		constructor(divid,data)
+		{
+			this.div_id=divid;
+			this.data=data;
+			this.table_index=ec_table_counter;
+			this.first_column_answers=true;
+			if (!(this.div_id==undefined) && !(this.data==undefined)) {
+			this.build_table();
+			ec_table_counter+=1;
+			}
+		}
+		build_table(div_id,mydata){
+		    if(div_id == undefined) {div_id=this.div_id; }
+		    if(mydata == undefined) {mydata=this.data; }
+			var mydiv=document.getElementById(div_id);
+			if (ec_add_checkbox==true){
+				var mydiv_row1=document.createElement("div");
+				mydiv_row1.innerHTML="<input type=checkbox id='ck_"+div_id+"checkall' onclick='ectable_check_all(\"ck_"+div_id+"\",this.checked);'>";
+				mydiv.appendChild(mydiv_row1);
+			}
+			var mydiv_row2=document.createElement("div");
+			mydiv.appendChild(mydiv_row2);
+
+			var mytable=document.createElement("table");
+			mytable.setAttribute("id", "my_ec_table_"+div_id);
+			mytable.className="ec_table";
+			//mytable.setAttribute("class","ec_table");
+								
+			var theader=document.createElement("thead");
+			var tbody=document.createElement("tbody");
+			mytable.appendChild(theader);
+			mytable.appendChild(tbody);
+			mydata.forEach( (row,index) => { 
+				if (index==0){					
+					var headerrow=document.createElement("tr");
+					theader.appendChild(headerrow);
+					//var emptycell=document.createElement("th");
+					//emptycell.innerHTML="";
+					//headerrow.appendChild(emptycell);
+					row.forEach( (item,item_index ) => {
+						var newcell = document.createElement("th");
+						newcell.innerHTML = item;
+						newcell.className="ec_th";
+						headerrow.appendChild(newcell);
+					}); 					
+				} else {
+					var newtr=document.createElement("tr");
+					newtr.className="ec_tr";
+					if ((this.first_column_answers==false)&&(ec_add_checkbox==true) )   {
+						var checkbox=document.createElement("td");
+						checkbox.className="ec_td";
+						checkbox.innerHTML = "<input type=checkbox id='ck_"+div_id+index+"' name='ck_"+div_id+"' '>";
+						//checkbox.innerHTML = "<input type=checkbox id='ck_"+div_id+index+"' name='ck_"+div_id+"' onclick='ectable_get_checked_items_list(\"ck_"+div_id+"\");'>";
+						newtr.appendChild(checkbox);
+					}
+					 row.forEach( (item,item_index ) => {
+							if ((this.first_column_answers==true) && (item_index==0) &&(ec_add_checkbox==true)){
+								var newcell = document.createElement("td");
+								newcell.className="ec_td";
+								newcell.innerHTML = "<input type=checkbox id='ck_"+div_id+index+"' name='ck_"+div_id+"' >"+item;
+								//newcell.innerHTML = "<input type=checkbox id='ck_"+div_id+index+"' name='ck_"+div_id+"' onclick='ectable_get_checked_items_list(\"ck_"+div_id+"\");'>"+item;
+								newtr.appendChild(newcell);
+							} else {
+								var newcell = document.createElement("td");
+								newcell.className="ec_td";
+								if (item instanceof Array == false) {
+								   newcell.innerHTML =  item;
+								} else {
+									var tinytable=document.createElement("table");
+									tinytable.setAttribute("style","border: 0px none transparent;");
+									newcell.appendChild(tinytable);
+									item.forEach( (next_line) => {
+										var tinyrow=document.createElement("tr");
+										tinyrow.setAttribute("style","border: 0px none transparent;background-color: transparent;");
+										tinytable.appendChild(tinyrow);
+										var tinytd =document.createElement("td");
+										tinytd.setAttribute("style","border: 0px none transparent;background-color: transparent;");
+										tinytd.innerHTML=next_line;
+										tinyrow.appendChild(tinytd);
+										});
+								}
+								newtr.appendChild(newcell);
+							}
+						});
+					tbody.appendChild(newtr);
+				}
+			});
+			mydiv_row2.appendChild(mytable);
+		} // end build_table method
+	}  // end Class EcTable definition
+
+
 function string_replace_to(original_string,item_to_replace,replace_to)
 {
 	while(original_string.toString().indexOf(item_to_replace)>0)
@@ -3517,3 +3634,31 @@ function string_replace_to(original_string,item_to_replace,replace_to)
 	}
 	return original_string;
 }
+
+
+
+function tcc_ectable_get_checked_items_list(name)
+		{
+			var items=document.getElementsByName(name); 
+			var checked_items=Array();
+			items.forEach((row,index) => {
+					var nextitem=document.getElementById(name+(index+1));
+					if (nextitem.checked) {checked_items.push(index); }
+			});
+			//alert(checked_items);
+			//alert(ec_table_counter);
+			return checked_items;
+		}
+
+function tcc_ectable_check_all(name,yesorno)
+		{
+			var items=document.getElementsByName(name); 
+			items.forEach((row,index) => {
+					var nextitem=document.getElementById(name+(index+1));
+					nextitem.checked=yesorno;
+					});
+		}
+
+
+
+
